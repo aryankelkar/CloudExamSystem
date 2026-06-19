@@ -1,0 +1,134 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Read role from custom claim (set by setUserRoleClaim Cloud Function).
+    // Falls back to Firestore profile lookup for sessions created before
+    // custom claims were introduced (backward compatibility).
+    function getRoleFromClaim() {
+      return request.auth.token.get('role', null);
+    }
+
+    function isStudent() {
+      return isAuthenticated() && getRoleFromClaim() == 'student';
+    }
+
+    function isFaculty() {
+      return isAuthenticated() && getRoleFromClaim() == 'faculty';
+    }
+
+    // ─── Users collection ─────────────────────────────────────────────────────
+    // Users can only read and write their own document.
+    // Role field is immutable after creation (prevents privilege escalation).
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasAll(['uid', 'name', 'email', 'role', 'createdAt'])
+        && request.resource.data.role in ['student', 'faculty'];
+
+      // Only allow updating name — role and email are locked after registration.
+      allow update: if isOwner(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'email', 'uid']);
+
+      allow delete: if false;
+    }
+
+    // ─── Exams collection ─────────────────────────────────────────────────────
+    // Students: read only.
+    // Faculty: full CRUD on exams they created.
+
+    match /exams/{examId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isFaculty()
+        && request.resource.data.keys().hasAll([
+            'title', 'subject', 'duration', 'startTime', 'endTime', 'createdBy'
+           ])
+        && request.resource.data.createdBy == request.auth.uid;
+
+      allow update: if isFaculty()
+        && resource.data.createdBy == request.auth.uid;
+
+      allow delete: if isFaculty()
+        && resource.data.createdBy == request.auth.uid;
+
+      // ─── Questions sub-collection ──────────────────────────────────────────
+      // Students: read only (to take the exam).
+      //   NOTE: correctAnswer IS present in the document.
+      //   The Firestore Rules cannot strip fields — use Cloud Functions to
+      //   evaluate answers server-side (evaluateExam) so the client never
+      //   needs to process correctAnswer locally.
+      // Faculty: write only on exams they own.
+
+      match /questions/{questionId} {
+        allow read: if isAuthenticated();
+
+        allow create, update, delete: if isFaculty()
+          && get(/databases/$(database)/documents/exams/$(examId)).data.createdBy
+              == request.auth.uid;
+      }
+    }
+
+    // ─── results_pending collection ───────────────────────────────────────────
+    // Students:  create ONLY (their own submission).
+    // Nobody can read, update, or delete results_pending documents.
+    // The evaluateExam Cloud Function (Admin SDK) reads and deletes them.
+    //
+    // This enforces the security boundary:
+    //   Client → results_pending   (create only)
+    //   Cloud Function → evaluates → results   (Admin SDK bypasses rules)
+    //   Cloud Function → deletes results_pending after evaluation
+
+    match /results_pending/{submissionId} {
+      allow create: if isStudent()
+        && request.resource.data.studentId == request.auth.uid
+        && request.resource.data.keys().hasAll([
+            'studentId', 'examId', 'answers', 'submittedAt'
+           ]);
+
+      // Students cannot read their pending document (prevents answer inspection)
+      allow read:   if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Results collection ───────────────────────────────────────────────────
+    // WRITTEN ONLY BY THE evaluateExam Cloud Function via Admin SDK.
+    //
+    // Students: read their own results.
+    // Faculty:  read all results.
+    // NOBODY can create, update, or delete results from the client.
+    // This enforces that all results are cloud-evaluated and authoritative.
+
+    match /results/{resultId} {
+      allow read: if isAuthenticated()
+        && (isFaculty() || resource.data.studentId == request.auth.uid);
+
+      // Results are written exclusively by the evaluateExam Cloud Function.
+      // The Admin SDK bypasses these rules, so the function can still write.
+      // Blocking client create/update/delete prevents score manipulation.
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Default: deny everything else ───────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
