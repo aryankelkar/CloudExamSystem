@@ -61,8 +61,8 @@ The Cloud-Based Online Examination & Analytics System is a web application that 
 - Integration with Learning Management Systems (LMS)
 
 ## Team Members
+- Aryan Kelkar
 - Sneha Bhundere
-- Team Members
 
 ## License
 This project is developed for academic and educational purposes.
