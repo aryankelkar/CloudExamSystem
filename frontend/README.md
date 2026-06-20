@@ -131,26 +131,13 @@ const firebaseConfig = {
 
 ## 🎯 Usage
 
-### Mock Data (Current State)
 
-The application currently uses mock data for demonstration purposes. The service files in `src/services/` contain mock implementations that simulate API calls.
-
-### Test Accounts
-
-**Student Account:**
-- Email: `student@test.com`
-- Password: `password123`
-
-**Faculty Account:**
-- Email: `faculty@test.com`
-- Password: `password123`
 
 ### Firebase Integration (Future)
 
 To enable Firebase integration:
 
 1. Uncomment the Firebase functions in service files
-2. Replace mock implementations with Firebase calls
 3. Set up Firestore collections:
    - `users` - User profiles
    - `exams` - Exam data
