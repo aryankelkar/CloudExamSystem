@@ -6,11 +6,17 @@ The Cloud-Based Online Examination & Analytics System is a web application devel
 
 This project was developed using React, Firebase, and Google Cloud Platform (GCP) as part of our Cloud Computing coursework. It demonstrates the use of cloud technologies such as serverless computing, cloud databases, authentication services, and analytics processing.
 
+<h3>Home Page</h3>
+<img src="images/HomePage.jpeg" width="900">
+---
+
 ## Problem Statement
 
 Traditional examination systems often involve manual paper checking, result preparation, and performance analysis. These processes can be time-consuming and prone to errors.
 
 The goal of this project is to provide a cloud-based solution that automates examination management, evaluation, and analytics while ensuring security and scalability.
+
+---
 
 ## Features
 
@@ -32,6 +38,8 @@ The goal of this project is to provide a cloud-based solution that automates exa
 * Submit answers digitally
 * View results instantly
 * Track personal performance
+
+---
 
 ## Technology Stack
 
@@ -58,31 +66,15 @@ The goal of this project is to provide a cloud-based solution that automates exa
 * Cloud Build
 * IAM
 
+---
+
 ## System Architecture
 
-```text
-Students / Faculty
-        │
-        ▼
-React Frontend
-        │
-        ▼
-Firebase Authentication
-        │
-        ▼
-Cloud Firestore
-        │
-        ▼
-Cloud Functions
-        │
- ┌──────┴─────────┐
- ▼                ▼
-BigQuery     Cloud Scheduler
- ▼
-Analytics Processing
- ▼
-Dashboard
-```
+<h2>System Architecture</h2>
+
+<img src="images/Architecture.png" width="900">
+
+---
 
 ## Cloud Concepts Used
 
@@ -99,6 +91,7 @@ This project helped us implement several cloud computing concepts, including:
 * Cloud Security
 * Pay-As-You-Go Computing
 
+---
 
 ## Authentication and Security
 
@@ -118,6 +111,7 @@ Two user roles are supported:
 
 Role-based access control ensures that users can only access features assigned to their role.
 
+---
 
 ## Database Structure
 
@@ -135,6 +129,21 @@ The application uses Cloud Firestore as its primary database.
 
 These collections store user information, examination data, results, analytics data, and system activity logs.
 
+<h3>Login Page</h3>
+<img src="images/LoginPage.jpeg" width="900">
+
+<h3>Available Exams Page</h3>
+<img src="images/AvailableExamsPage.jpeg" width="900">
+
+<h3>Results Page</h3>
+<img src="images/ResultPage.jpeg" width="900">
+
+<h3>Analytics Dashboard</h3>
+<img src="images/AnalyticsPage.jpeg" width="900">
+
+
+
+---
 
 ## Working of the System
 
@@ -154,6 +163,7 @@ Submitted answers are processed through Cloud Functions, which automatically cal
 
 Result data is transferred to BigQuery, where analytics are generated and displayed through dashboards.
 
+---
 
 ## Analytics Features
 
@@ -168,6 +178,7 @@ The analytics dashboard provides:
 
 These analytics help faculty evaluate overall class performance more effectively.
 
+---
 
 ## Future Enhancements
 
@@ -180,17 +191,20 @@ Some improvements that can be added in future versions include:
 * Advanced subject-wise analytics
 * Support for multiple institutions
 
+---
 
 ## Team Members
 
 * Sneha Bhundere
 * Aryan Kelkar
 
+---
 
 ## Conclusion
 
 The Cloud-Based Online Examination & Analytics System demonstrates how cloud technologies can be used to build a scalable, secure, and efficient examination platform. The project combines modern web development with cloud services to automate examination management, result evaluation, and performance analysis.
 
+---
 
 ## Academic Purpose
 
