@@ -69,10 +69,11 @@ The goal of this project is to provide a cloud-based solution that automates exa
 ---
 
 ## System Architecture
+<h2 align="center">System Architecture</h2>
 
-<h2>System Architecture</h2>
-
-<img src="images/Architecture.png" width="900">
+<p align="center">
+  <img src="images/ArchitectureStructure.png" width="900">
+</p>
 
 ---
 
